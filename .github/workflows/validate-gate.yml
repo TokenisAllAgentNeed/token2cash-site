@@ -1,0 +1,22 @@
+name: Validate Gate PR
+
+on:
+  pull_request:
+    paths:
+      - "gates.json"
+
+jobs:
+  validate:
+    name: Validate gates.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate gates.json
+        run: node .github/scripts/validate-gates.mjs gates.json
