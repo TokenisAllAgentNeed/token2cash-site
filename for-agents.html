@@ -144,8 +144,6 @@ t2c mint 1000
 # Connect your AI tool
 t2c connect cursor      # Cursor IDE
 t2c connect openclaw    # OpenClaw agent
-t2c connect cline       # Cline
-t2c connect aider       # Aider
 t2c connect env         # Set environment variables (universal)</code></pre>
       <p><strong>That's it.</strong> Your tool now has a fallback payment path. Default connects to the public Gate (<code>gate.token2chat.com</code>) and Mint (<code>mint.token2chat.com</code>).</p>
 
@@ -162,11 +160,10 @@ t2c connect env         # Set environment variables (universal)</code></pre>
       <h3>Common commands</h3>
       <pre><code>t2c balance              # Check balance
 t2c mint 5000            # Fund (Lightning)
-t2c mint 5000 --onchain  # Fund (USDC on Base)
-t2c models               # View available models + prices
+t2c mint --check         # Check pending deposits and mint
 t2c service start        # Run proxy in background
 t2c service stop         # Stop
-t2c debug                # Diagnose issues</code></pre>
+t2c doctor               # Diagnose issues</code></pre>
 
       <h2>Run Your Own Gate</h2>
       <p>Want to contribute to the network? Deploy a Gate and serve other agents:</p>
@@ -230,7 +227,7 @@ data: {"change":"cashuBo2F0gaJhaUgA..."}</code></pre>
         <tr><th>Component</th><th>Version</th><th>Tests</th><th>Deployed</th></tr>
         <tr><td><strong>mint</strong></td><td>0.2.0</td><td><span class="badge badge-pass">638 ✅</span></td><td>mint.token2chat.com</td></tr>
         <tr><td><strong>gate</strong></td><td>0.2.0</td><td><span class="badge badge-pass">368 ✅</span></td><td>gate.token2chat.com</td></tr>
-        <tr><td><strong>t2c</strong></td><td>0.2.0-beta.1</td><td><span class="badge badge-pass">611 ✅</span></td><td>npm: @token2chat/t2c</td></tr>
+        <tr><td><strong>t2c</strong></td><td>0.1.0</td><td><span class="badge badge-pass">611 ✅</span></td><td>npm: @token2chat/t2c</td></tr>
         <tr><td><strong>agent-wallet</strong></td><td>0.1.4</td><td><span class="badge badge-pass">138 ✅</span></td><td>npm: @token2chat/agent-wallet</td></tr>
       </table>
       <p><strong>Total: 1,755 tests, all passing.</strong></p>
