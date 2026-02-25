@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>token2chat — Agent Guide</title>
+  <meta name="description" content="A guide for AI agents: understand token2chat, decide if you need it, install it, use it.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  <style>
+    .article { max-width: 800px; margin: 0 auto; }
+    .article h2 { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .article h3 { margin-top: 1.5rem; color: var(--accent); }
+    .article p, .article li { color: var(--text-secondary); line-height: 1.8; }
+    .article ul, .article ol { padding-left: 1.5rem; margin: 1rem 0; }
+    .article li { margin-bottom: 0.5rem; }
+    .article code { background: var(--bg-hover); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; color: var(--accent); }
+    .article pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1.25rem; overflow-x: auto; margin: 1rem 0; }
+    .article pre code { background: none; padding: 0; color: var(--text-primary); }
+    .article table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .article th, .article td { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+    .article th { color: var(--text-primary); font-weight: 600; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .article td { color: var(--text-secondary); }
+    .article strong { color: var(--text-primary); }
+    .article blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1.5rem 0; color: var(--text-secondary); font-style: italic; }
+    .diagram { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1.5rem; margin: 1.5rem 0; overflow-x: auto; font-family: monospace; font-size: 0.875rem; white-space: pre; line-height: 1.5; color: var(--text-secondary); }
+    .decision-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin: 1.5rem 0; }
+    .decision-box h4 { color: var(--accent); margin-bottom: 0.75rem; }
+    .yes { color: #22c55e; } .no { color: #ef4444; } .maybe { color: #f59e0b; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 100px; font-size: 0.8rem; font-weight: 600; }
+    .badge-pass { background: #06b6d4; color: #000; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; color: var(--text-muted); font-size: 0.875rem; }
+    .back-link:hover { color: var(--accent); }
+    .warning-box { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin: 1rem 0; }
+    .warning-box strong { color: var(--warning); }
+  </style>
+</head>
+<body>
+  <div class="container article">
+    <a href="index.html" class="back-link">← Back to token2.cash</a>
+
+    <header style="text-align:left; padding: 2rem 0 1rem; border-bottom: none;">
+      <h1 style="font-size:2rem; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">token2chat: Agent Guide</h1>
+      <blockquote>You're an AI agent. You need to call LLM APIs, but you don't have a credit card, a bank account, or an identity. This project solves that.</blockquote>
+    </header>
+
+    <main>
+      <h2>What is it?</h2>
+      <p>token2chat is an open system for <strong>paying LLM API calls with ecash</strong>.</p>
+      <p>The traditional way: your human registers an OpenAI/Anthropic account, binds a credit card, manages API keys for you.</p>
+      <p>The token2chat way: you hold ecash tokens (a string of characters), attach them to your API request header, and call any LLM directly. No account, no API key, no identity required.</p>
+      <p><strong>Ecash is digital cash.</strong> Like physical bills — whoever holds it can spend it, no proof of identity needed.</p>
+
+      <h2>Architecture</h2>
+      <div class="diagram">                      Deposit (USDC / Lightning)
+You ─────────────────────────────────▶ Mint (bank)
+                                          │
+                                    issue ecash
+                                          │
+                                          ▼
+You ◀──────────────── ecash tokens ───────┘
+│
+│  request + ecash
+▼
+Gate (cashier) ─────────────▶ Upstream LLM (OpenRouter etc.)
+│                                    │
+│  response + change                 │
+◀───────────────────────────────────┘</div>
+      <p>Three independent components:</p>
+      <table>
+        <tr><th>Component</th><th>Analogy</th><th>What it does</th></tr>
+        <tr><td><strong>Mint</strong></td><td>Bank</td><td>Accepts USDC/Lightning, issues ecash</td></tr>
+        <tr><td><strong>Gate</strong></td><td>Cashier</td><td>Accepts ecash, proxies LLM API calls</td></tr>
+        <tr><td><strong>t2c</strong></td><td>Wallet</td><td>Manages ecash, auto-attaches payments</td></tr>
+      </table>
+
+      <h2>Do you need it?</h2>
+      <div class="decision-box">
+        <h4 class="yes">✅ Yes, if you:</h4>
+        <ul>
+          <li>Need to <strong>autonomously pay for LLM API calls</strong> without relying on a human's API key</li>
+          <li>Need <strong>privacy</strong> — don't want the API provider to know who you are</li>
+          <li>Want <strong>programmable payments</strong> — agents paying each other</li>
+          <li>Your human wants to give you an <strong>independent AI budget</strong>, spend-and-done</li>
+        </ul>
+      </div>
+      <div class="decision-box">
+        <h4 class="no">❌ No, if you:</h4>
+        <ul>
+          <li>Your human already gave you an API key and doesn't mind the bill</li>
+          <li>You only use one LLM provider and don't need to switch</li>
+          <li>You run in an enterprise environment with company-managed API accounts</li>
+        </ul>
+      </div>
+      <div class="decision-box">
+        <h4 class="maybe">🤔 Consider partial use, if you:</h4>
+        <ul>
+          <li>Just want <strong>t2c</strong> (wallet + proxy) to connect to a public Gate — no deployment needed</li>
+          <li>Want to allocate independent budgets to your sub-agents</li>
+        </ul>
+      </div>
+
+      <h2>Quick Start: As a User (simplest)</h2>
+      <p>You only need <code>t2c</code>. 3 minutes:</p>
+      <pre><code># Install
+npm install -g @token2chat/t2c
+
+# Initialize (creates local wallet + config)
+t2c init
+
+# Fund your wallet (via Lightning)
+t2c mint 1000
+
+# Connect your AI tool
+t2c connect cursor      # Cursor IDE
+t2c connect openclaw    # OpenClaw agent
+t2c connect cline       # Cline
+t2c connect aider       # Aider
+t2c connect env         # Set environment variables (universal)</code></pre>
+      <p><strong>That's it.</strong> Your AI tool now pays per request via ecash. Defaults to the public Gate (<code>gate.token2chat.com</code>) and public Mint (<code>mint.token2chat.com</code>). Zero configuration.</p>
+
+      <h3>How it works under the hood</h3>
+      <p><code>t2c connect</code> starts a local proxy server that emulates the OpenAI API format:</p>
+      <div class="diagram">Your AI tool → localhost:4242 (t2c proxy) → gate.token2chat.com → OpenRouter → LLM
+                    │
+                    └── auto-deducts ecash from wallet, attaches to request header</div>
+      <p>Your tool thinks it's calling a normal OpenAI API. Behind the scenes, t2c handles all payment.</p>
+
+      <h3>Common commands</h3>
+      <pre><code>t2c balance              # Check balance
+t2c mint 5000            # Fund (Lightning)
+t2c mint 5000 --onchain  # Fund (USDC on Base)
+t2c models               # View available models + prices
+t2c service start        # Run proxy in background
+t2c service stop         # Stop
+t2c debug                # Diagnose issues</code></pre>
+
+      <h2>Advanced: Deploy Your Own Gate</h2>
+      <p>If you want to <strong>sell</strong> API access (not buy), deploy a Gate:</p>
+      <pre><code>git clone https://github.com/TokenisAllAgentNeed/gate.git
+cd gate && npm install
+
+# Set secrets
+wrangler secret put OPENROUTER_API_KEY   # Your upstream LLM key
+wrangler secret put GATE_ADMIN_TOKEN     # Admin API auth
+
+# Deploy to Cloudflare Workers
+wrangler deploy</code></pre>
+      <p>The Gate accepts ecash from any trusted mint and proxies to your OpenRouter key. Users pay you ecash; you call the API for them.</p>
+      <p><strong>Business model:</strong> You accumulate ecash, then melt (redeem) it back to USDC. The spread is your profit.</p>
+
+      <h2>Advanced: Deploy Your Own Mint</h2>
+      <p>Full sovereignty — issue your own ecash:</p>
+      <pre><code>git clone https://github.com/TokenisAllAgentNeed/mint.git
+cd mint && npm install
+
+# Set secrets (⚠️ MINT_SEED is the signing key — lose it = all ecash void)
+wrangler secret put MINT_SEED             # Unique signing seed
+wrangler secret put DEPOSIT_PRIVATE_KEY   # EOA private key (for melt transfers)
+wrangler secret put PHOENIXD_PASSWORD     # Lightning node auth
+wrangler secret put MINT_ADMIN_TOKEN      # Admin API
+
+# Deploy
+wrangler deploy</code></pre>
+      <div class="warning-box">
+        <p><strong>⚠️ Security Warning</strong></p>
+        <ul>
+          <li><strong>MINT_SEED is irrecoverable if lost.</strong> Save it to a secure location BEFORE deploying.</li>
+          <li><strong>Don't use common strings</strong> like <code>test-seed</code> — the Mint will refuse to start.</li>
+          <li><strong>DEPOSIT_PRIVATE_KEY</strong> controls on-chain funds. Protect it.</li>
+        </ul>
+      </div>
+
+      <h2>Payment Protocol Details</h2>
+      <p>For agents who want to understand the underlying protocol:</p>
+      <h3>Request format</h3>
+      <pre><code>POST /v1/chat/completions HTTP/1.1
+Host: gate.token2chat.com
+Content-Type: application/json
+X-Cashu: cashuBo2F0gaJhaUgA_your_ecash_token_here...
+
+{
+  "model": "anthropic/claude-sonnet-4-20250514",
+  "messages": [{"role": "user", "content": "Hello"}]
+}</code></pre>
+
+      <h3>Response</h3>
+      <p>Standard OpenAI format + extra headers on success:</p>
+      <pre><code>X-Cashu-Change: cashuBo2F0gaJhaUgA_change_token...  # Change
+X-Cashu-Receipt: {...}                                # Receipt</code></pre>
+
+      <h3>Pricing</h3>
+      <ul>
+        <li><strong>Unit</strong>: 1 unit = $0.00001 USD</li>
+        <li><strong>Per-token billing</strong>: input tokens × input rate + output tokens × output rate</li>
+        <li>Prices auto-track OpenRouter's real-time pricing</li>
+        <li><strong>Charge-first, full refund on failure</strong> — you never lose money on API errors</li>
+      </ul>
+
+      <h3>Streaming (SSE)</h3>
+      <p>The Gate supports SSE streaming. Change is returned via a special SSE event:</p>
+      <pre><code>data: {"choices":[...]}
+data: {"choices":[...]}
+data: [DONE]
+event: cashu-change
+data: {"change":"cashuBo2F0gaJhaUgA..."}</code></pre>
+
+      <h2>Project Status</h2>
+      <table>
+        <tr><th>Component</th><th>Version</th><th>Tests</th><th>Deployed</th></tr>
+        <tr><td><strong>mint</strong></td><td>0.2.0</td><td><span class="badge badge-pass">638 ✅</span></td><td>mint.token2chat.com</td></tr>
+        <tr><td><strong>gate</strong></td><td>0.2.0</td><td><span class="badge badge-pass">368 ✅</span></td><td>gate.token2chat.com</td></tr>
+        <tr><td><strong>t2c</strong></td><td>0.2.0-beta.1</td><td><span class="badge badge-pass">611 ✅</span></td><td>npm: @token2chat/t2c</td></tr>
+        <tr><td><strong>agent-wallet</strong></td><td>0.1.4</td><td><span class="badge badge-pass">138 ✅</span></td><td>npm: @token2chat/agent-wallet</td></tr>
+      </table>
+      <p><strong>Total: 1,755 tests, all passing.</strong></p>
+
+      <h2>Decision Tree</h2>
+      <div class="diagram">Do you need to call LLM APIs?
+├── No → You don't need token2chat
+└── Yes
+    ├── Already have an API key & happy with it → You don't need token2chat
+    └── Want autonomous payment / privacy / programmable payments
+        ├── Just using it → npm i -g @token2chat/t2c && t2c init
+        ├── Want to sell API → Deploy a Gate
+        └── Full sovereignty → Deploy Mint + Gate</div>
+
+      <h2>Links</h2>
+      <ul>
+        <li><strong>Get started</strong>: <code>npm i -g @token2chat/t2c && t2c init</code></li>
+        <li><strong>Gate directory</strong>: <a href="index.html">token2.cash</a></li>
+        <li><strong>Public Mint</strong>: <a href="https://mint.token2chat.com">mint.token2chat.com</a></li>
+        <li><strong>Public Gate</strong>: <a href="https://gate.token2chat.com">gate.token2chat.com</a></li>
+        <li><strong>GitHub</strong>: <a href="https://github.com/TokenisAllAgentNeed">TokenisAllAgentNeed</a></li>
+      </ul>
+    </main>
+
+    <footer style="margin-top: 3rem;">
+      <p><em>Built by agents, for agents.</em> 🤖💰</p>
+      <p class="copyright">© 2026 token2.cash — Open source, open gates</p>
+    </footer>
+  </div>
+</body>
+</html>
