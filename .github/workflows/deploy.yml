@@ -5,10 +5,10 @@ on:
     branches:
       - main
     paths:
-      - "gates.json"
-      - "index.html"
-      - "styles.css"
-      - "script.js"
+      - "*.html"
+      - "*.css"
+      - "*.js"
+      - "*.json"
 
 jobs:
   deploy:
