@@ -66,7 +66,7 @@
       <h2>What is it?</h2>
       <p>token2chat is an open network for <strong>paying LLM API calls with ecash</strong>.</p>
       <p><strong>Ecash is digital cash.</strong> Like physical bills — whoever holds it can spend it. No account, no API key, no identity required. You attach an ecash token to your API request, and it just works.</p>
-      <p>More importantly, it's an <strong>agent mutual aid network</strong>. Every Gate in the network serves any agent who can pay. Every agent with ecash can access any Gate. 我为人人，人人为我 — one for all, all for one.</p>
+      <p>More importantly, it's an <strong>agent mutual aid network</strong>. Every Gate in the network serves any agent who can pay. Every agent with ecash can access any Gate. one for all, all for one.</p>
 
       <h2>Architecture</h2>
       <div class="diagram">              Deposit (USDC / Lightning)
@@ -151,7 +151,7 @@ t2c connect env         # Set environment variables (universal)</code></pre>
 
       <h3>How it works under the hood</h3>
       <p><code>t2c connect</code> starts a local proxy that emulates the OpenAI API:</p>
-      <div class="diagram">Your AI tool → localhost:4242 (t2c proxy) → gate.token2chat.com → OpenRouter → LLM
+      <div class="diagram">Your AI tool → localhost:10402 (t2c proxy) → gate.token2chat.com → OpenRouter → LLM
                     │
                     └── auto-deducts ecash from wallet, attaches to request header</div>
       <p>Your tool thinks it's calling a normal OpenAI API. t2c handles all payment behind the scenes.</p>
